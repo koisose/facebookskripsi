@@ -1,0 +1,203 @@
+<html>
+  <head>
+    <title>Pertanyaan</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <script type="text/javascript" src="https://code.jquery.com/jquery-2.1.1.min.js"></script>
+  <!-- Compiled and minified CSS -->
+  <link rel="stylesheet" href="/materialize/css/materialize.min.css">
+
+  <!-- Compiled and minified JavaScript -->
+  <script src="materialize/js/materialize.min.js"></script>
+          
+<script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.6.4/angular.min.js"></script>
+  
+  </head>
+  <body ng-app="pertanyaan">
+      <div >
+      <h1>Pertanyaan</h1>
+    
+      <div class="row">
+  <!--pertanyaan jawaban kiri-->
+  <script>
+  
+    var app =angular.module('pertanyaan',[])
+    app.controller('listpertanyaan',function($scope,$http){
+      $scope.listPertanyaan1=[]
+      $scope.idPertanyaan=null
+      $scope.editPertanyaan1=null
+      $scope.editJawaban1=null
+      //untuk mendapatkan list pertanyaan
+      $http.get('/pertanyaanecommerce')
+      .then(data=>{$scope.listPertanyaan1=data.data;})
+      .catch(err=>{console.log(err);})
+      //untuk mendapatkan list pertanyaan
+      
+      //untuk menambah pertanyaan
+      $scope.tambahPertanyaan=function(pertanyaan,jawaban){
+        $http.post('/pertanyaanecommerce',{pertanyaan:pertanyaan,jawaban:jawaban})
+        .then(data=>{
+          alert("sukses")
+          $scope.listPertanyaan1.push(data.data);
+          $scope.pertanyaan1=""
+          $scope.jawaban1=""
+           $scope.editPertanyaan1=""
+          $scope.editJawaban1=""
+        })
+        .catch(err=>{console.log(err);})
+        }
+        //untuk menambah pertanyaan
+      
+        //untuk mendelete pertanyaan
+          $scope.deletePertanyaan=function(id){
+           var dialog=$('#modal1')
+        dialog.modal("close");
+        $http.post('/deletepertanyaanecommerce',{id:id})
+        .then(data=>{$scope.listPertanyaan1=data.data;})
+        .catch(err=>{console.log(err);})
+        }
+        
+        //untuk mendelete pertanyaan
+      
+        //untuk mengedit pertanyaan
+          $scope.editPertanyaan=function(id,pertanyaan,jawaban){
+        $http.post('/editpertanyaanecommerce',{_id:id,berubah:{pertanyaan:pertanyaan,jawaban:jawaban}})
+        .then(data=>{$scope.listPertanyaan1=data.data;})
+        .catch(err=>{console.log(err);})
+              var dialog=$('#modal2')
+        dialog.modal("close");
+        
+        }
+        //untuk mengedit pertanyaan
+        // close dialog edit
+        $scope.closeDialogEdit=function(){
+          var dialog=$('#modal2')
+        dialog.modal("close");
+        }
+        // close dialog edit
+        
+        // open dialog edit
+        $scope.openDialogEdit=function(id){
+          $scope.idPertanyaan=id
+        $http.get('/pertanyaanecommerce',{params:{_id:id}})
+          .then(data=>{
+          var dialog=$('#modal2')
+        dialog.modal("open");
+            $scope.editPertanyaan1=data.data[0].pertanyaan
+            $scope.editJawaban1=data.data[0].jawaban
+            })
+          .catch(err=>{
+            console.log(err)
+          })
+        }
+        // close dialog edit
+        $scope.closeDialogDelete=function(){
+          var dialog=$('#modal1')
+        dialog.modal("close");
+        }
+        // close dialog delete
+        
+        // open dialog delete
+        $scope.openDialogDelete=function(id){
+          var dialog=$('#modal1')
+        dialog.modal("open");
+        $scope.idPertanyaan=id
+          
+        }
+        // open dialog delete
+  })
+  
+    
+  </script>
+  <div ng-controller="listpertanyaan" class="col s6">
+  <!--form tambah pertanyaan-->
+    Pertanyaan
+      <div class="mdl-textfield mdl-js-textfield">
+    <textarea class="mdl-textfield__input" type="text" rows= "3" id="sample5" ng-model="pertanyaan1"></textarea>
+    <label class="mdl-textfield__label" for="sample5">pertanyaan</label>
+  </div>
+    <br>
+    Jawaban
+      <div class="mdl-textfield mdl-js-textfield">
+    <textarea class="mdl-textfield__input" type="text" rows= "3" id="sample5" ng-model="jawaban1" ></textarea>
+    <label class="mdl-textfield__label" for="sample5">jawaban</label>
+  </div>
+    <br>
+    <button class="mdl-button mdl-js-button mdl-button--raised mdl-button--colored" ng-click="tambahPertanyaan(pertanyaan1,jawaban1)">
+  simpan
+</button>
+<!--form tambah pertanyaan-->
+<h3>Jumlah Pertanyaan:{{listPertanyaan1.length}}</h3>
+  <!--untuk mendelete pertanyaan-->
+    <!-- Modal Structure -->
+  <div id="modal1" class="modal">
+    <div class="modal-content">
+      <p>
+        yakin mau delete ?
+      </p>
+    </div>
+    <div class="modal-footer">
+      <button type="button" class="waves-effect waves-light btn" ng-click="deletePertanyaan(idPertanyaan)">ya</button>
+      <button type="button" class="waves-effect waves-light btn" ng-click="closeDialogDelete()">tidak</button>
+    </div>
+  </div>
+    <!--untuk mendelete pertanyaan-->
+  
+  <!--untuk mengedit pertanyaan-->
+  <div id="modal2" class="modal">
+    <div class="modal-content">
+       <div class="input-field col s12">
+          <textarea id="textarea1" ng-model="editPertanyaan1" class="materialize-textarea"></textarea>
+          <label for="textarea1">Pertanyaan</label>
+        </div>
+      <div class="input-field col s12">
+          <textarea id="textarea1" class="materialize-textarea" ng-model="editJawaban1"></textarea>
+          <label for="textarea1">Jawaban</label>
+        </div>
+    </div>
+    <div class="modal-footer">
+      <button type="button" class="waves-effect waves-light btn" ng-click="editPertanyaan(idPertanyaan,editPertanyaan1,editJawaban1)">ya</button>
+      <button type="button" class="waves-effect waves-light btn" ng-click="closeDialogEdit()">tidak</button>
+    </div>
+  </div>
+      
+  <!--untuk mengedit pertanyaan-->
+  
+  <!--tabel pertanyaan-->
+    <table class="responsive-table">
+  <thead>
+    <tr>
+      <th>pertanyaan</th>
+      <th>jawaban</th>
+      <th>action</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr ng-repeat="list in listPertanyaan1">
+      <td >{{list.pertanyaan}}</td>
+      <td>{{list.jawaban}}</td>
+      <td>
+        <button class="waves-effect waves-light btn " data-target="modal1" ng-click="openDialogDelete(list._id)">
+delete
+</button>
+<button class="waves-effect waves-light btn" data-target="modal2" ng-click="openDialogEdit(list._id)">
+edit
+</button>
+
+</td>
+    </tr>
+    </tbody>
+</table>
+<!--tabel pertanyaan-->
+</div>
+<!--pertanyaan jawaban kiri-->
+<!--pertanyaan jawaban kanan-->
+  <div class="col s6">1</div>
+  <!--pertanyaan jawaban kanan-->
+  <!--row-->
+  </div>
+    
+      </div>
+    </body>
+          
+  
+</html>

@@ -1,0 +1,81 @@
+<title>Pertanyaan Bimbingan</title>
+
+<div ng-app="bimbingan">
+    <!-- Accent-colored raised button with ripple -->
+<a href="/goal" class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect mdl-button--accent">
+  GOAL
+</a>
+
+<a ></a>
+<!--pak faisal-->
+<div ng-controller="pakFaisal">
+<h1>Pertanyaan untuk pak faisal</h1>
+<ul>
+    <li>saya mau bertanya tentang bagaimana cara menghitung jumlah pelanggan puas dengan pertanyaan saya apakah saya boleh memakai library sentiment analysis?</li>
+</ul>
+tambah pertanyaan
+<textarea id="pertanyaanFaisal"></textarea>
+<button class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect mdl-button--accent">Tambah Pak faisal</button>
+</div>
+<!--pak faisal-->
+<!--pak yoga-->
+<div ng-controller="pakYoga">
+<h1>Pertanyaan untuk pak yoga</h1>
+<ul>
+    <li ng-repeat="tanya in pertanyaan">{{tanya.pertanyaan}}<a href="#" ng-click="jawab(t)">jawab</a>&nbsp<a href="#">delete</a></li>
+</ul>
+tambah pertanyaan
+<span ng-show="error">Error</span>
+<textarea ng-model="pertanyaanYoga"></textarea>
+<button class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect mdl-button--accent" ng-disabled="nanyaPakYoga" ng-click="bertanyaPakYoga('pak_yoga',pertanyaanYoga)">Tambah Pak yoga</button>
+</div>
+<!--pak yoga-->
+</div>
+<link rel="stylesheet" href="./material.min.css">
+<script src="./material.min.js"></script>
+<link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
+  <style>
+    .mdl-layout__drawer-button{
+      padding-top:12px;
+    }
+  </style>
+ 
+<script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/angularjs/1.6.3/angular.min.js"></script>
+<script type="text/javascript">
+(function(){
+    var app = angular.module('bimbingan', []);
+app.controller('pakFaisal', function($scope,$http) {
+    $scope.pertanyaan=[]
+});
+app.controller('pakYoga', function($scope,$http) {
+    $scope.error=false;
+    $scope.pertanyaan=[]
+    $http.get("/pertanyaanbimbingan/pak_yoga")
+    .then(res=>{
+        $scope.pertanyaan=res.data
+    })
+    .catch(err=>{
+        alert(err)
+    })
+    $scope.pertanyaanYoga=''
+    $scope.nanyaPakYoga= false;
+    $scope.bertanyaPakYoga=function(pembimbing,pertanyaan){
+$scope.nanyaPakYoga=true        
+$http.post('/pertanyaanbimbingan', {pembimbing:pembimbing,pertanyaan:pertanyaan,jawaban:""})
+.then(data=>{
+    $scope.nanyaPakYoga= false;
+    console.log(data.data)
+})
+.catch(err=>{
+    $scope.error=true
+    setTimeout(function(){
+    $scope.error=false    
+    },5000)
+    $scope.nanyaPakYoga= false;
+    console.log(err)
+})
+    }
+});
+})()
+    
+</script>
